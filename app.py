@@ -20,11 +20,32 @@ else:
     offline_mode = True
 
 def offline_reply(text):
-    return "Offline mode: " + (text if text else "")
+    t = (text or "").strip().lower()
+    if not t:
+        return "Tell me what you need help with."
+    if any(g in t for g in ["hi", "hello", "hey", "namaste", "hola"]):
+        return "Hello! How can I help you today?"
+    if "how are you" in t:
+        return "I'm good and ready to help. What do you need?"
+    if "your name" in t:
+        return "I'm your local assistant."
+    if "help" in t:
+        return "Share your goal and I’ll guide you step by step."
+    if "joke" in t:
+        return "Why did the developer go broke? Because they used up all their cache."
+    if "time" in t and "date" in t:
+        import datetime
+        now = datetime.datetime.now()
+        return f"It’s {now.strftime('%Y-%m-%d %H:%M')}."
+    return "I’m offline, but I can still explain, brainstorm, or plan with you."
 
 def chat():
     global client, token, offline_mode
-    messages = [SystemMessage("You are a helpful assistant.")]
+    messages = [SystemMessage("You are a helpful assistant. Answer directly and do not repeat the user's message.")]
+    if not offline_mode and client:
+        initial = "Hi! How can I help you today?"
+        print("Assistant: " + initial)
+        messages.append(AssistantMessage(initial))
     while True:
         try:
             user_input = input("You: ").strip()
